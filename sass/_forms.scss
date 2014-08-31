@@ -1,0 +1,12 @@
+input[type="text"] {
+	width: 100%;
+	padding: 7px;
+	outline: none;
+	box-shadow: inset 0px 2px 1px 0px #EFF2F4;
+	border: 1px solid darken(#EFF2F4, 15%);
+	transition: all 1s;
+}
+
+input[type="text"]:focus {
+	border: 1px solid lighten($spearmint, 20%);
+}

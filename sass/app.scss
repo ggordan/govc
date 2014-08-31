@@ -1,0 +1,21 @@
+@import "general";
+@import "normalize";
+@import "swatch";
+@import "forms";
+@import "repo";
+
+body, html, body > div {
+	width: 100%;
+	min-height: 100%;
+	font-size: 13px;
+}
+
+body {
+    background: $body_background;
+    color: #333333;
+    font-family: "Open Sans", sans-serif;
+}
+
+#app {
+	display: flex;
+}
