@@ -19,7 +19,7 @@ var Commits = React.createClass({
 
     componentWillMount: function() {
     	$.ajax({
-    		url: "/1/commits",
+    		url: "/commits",
     		success: function(c) {
     			this.setState({
     				commits: JSON.parse(c)

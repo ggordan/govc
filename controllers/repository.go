@@ -17,6 +17,7 @@ type branchJSON struct {
 	Name   string
 	Head   bool
 	Target string
+	Remote bool
 	Tag    bool
 }
 
@@ -24,46 +25,45 @@ type metaStruct struct {
 	Branches []branchJSON
 }
 
-func MetaHandler(res http.ResponseWriter, req *http.Request) {
+// Commits returns all the commits for the specified repository
+func Branches(res http.ResponseWriter, req *http.Request) {
 	var meta metaStruct
-
-	repo, _ := git2go.OpenRepository("/Users/ggordan/bootstrap")
-
-	// iterate remote Branches
-	branches, err := repo.NewBranchIterator(git2go.BranchLocal)
-	if err == nil {
-		for {
-			branch, _, err := branches.Next()
-			if err != nil {
-				break
-			}
-			branchName, _ := branch.Name()
-			isHead, _ := branch.IsHead()
-			meta.Branches = append(meta.Branches, branchJSON{
-				Name:   branchName,
-				Target: branch.Target().String(),
-				Head:   isHead,
-				Tag:    branch.IsTag(),
-			})
-		}
+	repo, err := git2go.OpenRepository("/home/ggordan/bootstrap")
+	if err != nil {
+		panic(err)
 	}
 
-	// iterate remote Branches
-	branches, err = repo.NewBranchIterator(git2go.BranchRemote)
-	if err == nil {
-		for {
-			branch, _, err := branches.Next()
-			if err != nil {
-				break
+	// Iterate through all the branch types
+	for _, branchType := range []git2go.BranchType{git2go.BranchRemote, git2go.BranchLocal} {
+		// Get all the branches
+		branches, _ := repo.NewBranchIterator(branchType)
+
+		branch, _, _ := branches.Next()
+		for branch != nil {
+
+			var isRemote bool
+			if branchType == git2go.BranchRemote {
+				isRemote = true
 			}
+
+			// Get the branch target SHA1
+			var targetString string
+			targetOid := branch.Target()
+			if targetOid != nil {
+				targetString = targetOid.String()
+			}
+
 			branchName, _ := branch.Name()
 			isHead, _ := branch.IsHead()
 			meta.Branches = append(meta.Branches, branchJSON{
 				Name:   branchName,
-				Target: branch.Target().String(),
+				Target: targetString,
 				Head:   isHead,
+				Remote: isRemote,
 				Tag:    branch.IsTag(),
 			})
+			branch, _, err = branches.Next()
+
 		}
 	}
 
@@ -91,7 +91,7 @@ func Commits(res http.ResponseWriter, req *http.Request) {
 	// Get the request variables from the URL
 	_ = mux.Vars(req)
 
-	repo, err := git2go.OpenRepository("/Users/ggordan/bootstrap")
+	repo, err := git2go.OpenRepository("/home/ggordan/bootstrap")
 	if err != nil {
 		panic(err)
 	}
