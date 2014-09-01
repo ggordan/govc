@@ -29,7 +29,7 @@
 						word-wrap: break-word;
 						border-radius: 3px;
 						width: 80%;
-						transition: all 0.5s;
+						transition: all 0.2s;
 						.icon {
 							color:  darken($body_background, 20%);
 							margin-right: 10px;
@@ -41,9 +41,23 @@
 							align-items: baseline;
 							text-overflow: ellipsis;
 							white-space: nowrap;
+							.head {
+								margin-left: 10px;
+								font-weight: bold;
+							}
 						}
 						&:hover {
+							position: relative;
 							background: darken($body_background, 5%);
+							&:before {
+								position: absolute;
+								top: 3px;
+								color: darken($body_background, 25%);;
+								right: 8px;
+								display: block;
+								font-size: 0.8em;
+								content: '(checkout)';
+							}
 						}
 					}
 				}
