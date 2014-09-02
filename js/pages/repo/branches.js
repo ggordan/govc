@@ -46,8 +46,6 @@ var Branches = React.createClass({
                     remote: remote,
                 });
 
-                console.log(this.state);
-
     		}.bind(this)
     	});
     },

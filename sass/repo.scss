@@ -19,11 +19,7 @@
 					padding: 0 20px 0px 20px;
 				}
 				ul {
-					padding: 0;
-					margin: 0;
 					li {
-						list-style-type: none;
-						list-style-position: inside;
 						cursor: pointer;
 						padding: 8px 20px;
 						word-wrap: break-word;
@@ -68,15 +64,54 @@
 		flex: 1;
 		margin: 20px;
 		.status {
-			border-bottom: 5px solid darken($body_background, 10%);
-			display: none;
-			.filesys {
-				background: blue;
-				min-height: 500px;
+			h2 {
+				font-size: 1em;
+			}
+			margin-bottom: 10px;
+			.commitBox {
+				background: #fff;
+				border-bottom: 1px solid darken($body_background, 10%);
+				padding: 20px;
+				margin-bottom: 10px;
 				display: flex;
+				input[type="text"] {
+					flex: 1;
+				}
+				input[type="button"] {
+					background: $blue;
+					color: #fff;
+					font-weight: bold;
+					border: 1px solid darken($blue, 5%);
+					padding: 0 10px;
+					margin-left: 10px;
+				}
+			}
+			.filesys {
+				height: 350px;
+				display: flex;
+				background: #fff;
+				border-bottom: 1px solid darken($body_background, 10%);
+				padding: 20px;
 				.files {
 					flex: 1;
-					background: red;
+					background: #fff;
+					overflow-x: auto;
+					ul {
+						li {
+							display: block;
+							padding: 8px 5px;
+							border-bottom: 1px solid #eaeaea;
+						}
+					}
+				}
+				.diff {
+					flex: 2;
+					background: #e2e2e2;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					font-size: 4em;
+					color: #fff;
 				}
 			}
 		}

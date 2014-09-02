@@ -29,7 +29,7 @@ type metaStruct struct {
 // Branches returns all the commits for the specified repository
 func Branches(res http.ResponseWriter, req *http.Request) {
 	var meta metaStruct
-	repo, err := git2go.OpenRepository("/Users/ggordan/bootstrap")
+	repo, err := git2go.OpenRepository("/home/ggordan/bootstrap")
 	if err != nil {
 		panic(err)
 	}
@@ -92,7 +92,7 @@ func Commits(res http.ResponseWriter, req *http.Request) {
 	// Get the request variables from the URL
 	_ = mux.Vars(req)
 
-	repo, err := git2go.OpenRepository("/Users/ggordan/bootstrap")
+	repo, err := git2go.OpenRepository("/home/ggordan/bootstrap")
 	if err != nil {
 		panic(err)
 	}
@@ -125,9 +125,15 @@ func Commits(res http.ResponseWriter, req *http.Request) {
 
 // Status returns all the commits for the specified repository
 func Status(res http.ResponseWriter, req *http.Request) {
-	var b []interface{}
 
-	repo, err := git2go.OpenRepository("/Users/ggordan/bootstrap")
+	type statusJSON struct {
+		Kind  string
+		Entry interface{}
+	}
+
+	var b []statusJSON
+
+	repo, err := git2go.OpenRepository("/home/ggordan/bootstrap")
 	if err != nil {
 		panic(err)
 	}
@@ -139,9 +145,26 @@ func Status(res http.ResponseWriter, req *http.Request) {
 	entries, _ := statusList.EntryCount()
 
 	for i := 0; i < entries; i++ {
+		var t string
 		entry, _ := statusList.ByIndex(i)
-		fmt.Println(entry)
-		b = append(b, entry)
+
+		switch entry.Status {
+		case git2go.StatusIndexNew:
+			t = "index_new"
+		case git2go.StatusWtModified:
+			fallthrough
+		case git2go.StatusIndexModified:
+			t = "index_modified"
+		case git2go.StatusWtDeleted:
+			fallthrough
+		case git2go.StatusIndexDeleted:
+			t = "index_deleted"
+		}
+
+		b = append(b, statusJSON{
+			Kind:  t,
+			Entry: entry,
+		})
 	}
 
 	fmt.Println("DATA", statusList, entries)

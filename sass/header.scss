@@ -1,0 +1,8 @@
+@import "swatch";
+
+#header {
+	background: darken($body_background, 10%);
+	border-bottom: 1px solid #fff;
+	box-shadow: inset 0px -1px 0px darken($body_background, 20%);
+	height: 50px;
+}

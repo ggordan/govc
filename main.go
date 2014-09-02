@@ -5,8 +5,6 @@ import (
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/ggordan/govc/controllers"
-
-	// _ "github.com/mattn/go-sqlite3"
 )
 
 func main() {

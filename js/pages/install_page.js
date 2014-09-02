@@ -4,8 +4,6 @@ var React = require('react');
 
 var InstallPage = React.createClass({
 
-
-
     // RENDER
 
     render: function() {

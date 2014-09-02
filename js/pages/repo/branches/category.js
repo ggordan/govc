@@ -14,7 +14,7 @@ var Category = React.createClass({
     render: function() {
 
         var data = this.props.data.map(function(item, index) {
-            return <Branch data={item} />;
+            return <Branch data={item} key={index} />;
         });
 
         return(

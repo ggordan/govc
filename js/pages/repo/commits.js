@@ -36,6 +36,7 @@ var Commits = React.createClass({
 
         return(
             <div className="commits">
+                <h1> Commits </h1>
             	{commits}
             </div>
         );

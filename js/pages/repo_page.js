@@ -3,7 +3,7 @@
 var React = require('react');
 
 // Scope all the components
-var Status = require('pages/repo/status');
+var StatusList = require('pages/repo/status_list');
 var Commits = require('pages/repo/commits');
 var Branches = require('pages/repo/branches');
 
@@ -18,7 +18,7 @@ var RepoPage = React.createClass({
                     <Branches />
                 </div>
             	<div className="repository">
-	            	<Status />
+	            	<StatusList />
 	            	<Commits />
             	</div>
             </div>
