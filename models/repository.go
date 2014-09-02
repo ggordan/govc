@@ -1,44 +1,92 @@
 package models
 
 import (
-	"database/sql"
 	"fmt"
-	"log"
 
-	"github.com/ggordan/govc/conf"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/ggordan/govc/database"
+	_ "github.com/mattn/go-sqlite3" // Blank import to add support for SQLite
 )
 
+// RepositoryTableName is the name of the tables in SQLite
+const RepositoryTableName string = "repos"
+
+// Repository corresponds to a single row in the repository table
 type Repository struct {
-	ID       int    `json:"id"`
+	ID       int64  `json:"id"`
 	Name     string `json:"name"`
 	Location string `json:"location"`
 }
 
-// Create creates a new repository
-func (r *Repository) Create(name, location string) {
+// CreateRepository a new repository
+func CreateRepository(name, location string) (repository *Repository, err error) {
 
-	r.Name = name
-	r.Location = location
+	// Set the repository data
+	repository.Name = name
+	repository.Location = location
 
+	createQuery := fmt.Sprintf("INSERT INTO %s(name, location) VALUES(?, ?)", RepositoryTableName)
+
+	// Get the database
+	db, err := database.GetDB()
+	if err != nil {
+		return nil, err
+	}
+
+	// Save the new repository to the database
+	result, err := db.Exec(createQuery, name, location)
+	if err != nil {
+		return nil, err
+	}
+
+	// Retrieve the ID of the newly inserted repository
+	repository.ID, err = result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	return repository, nil
 }
 
-func GetFromID(id string) *Repository {
+// GetRepository retries the repository with the id
+func GetRepository(searchID int) (repository Repository, err error) {
 
-	db, err := sql.Open("sqlite3", conf.GetDBPath())
+	getQuery := fmt.Sprintf("SELECT * FROM %s WHERE id = ?", RepositoryTableName)
+
+	// Get the database
+	db, err := database.GetDB()
 	if err != nil {
-		log.Fatal(err)
+		return Repository{}, err
 	}
 
-	var repo Repository
+	row := db.QueryRow(getQuery, searchID)
 
-	rows, err := db.Query("SELECT * FROM repos WHERE id = ?", id)
+	row.Scan(&repository.ID, &repository.Name, &repository.Location)
+
+	return repository, nil
+}
+
+// GetAllRepositories returns all the repositories that the user has created
+func GetAllRepositories() (repositories []*Repository, err error) {
+
+	allQuery := fmt.Sprintf("SELECT * FROM %s", RepositoryTableName)
+
+	// Get the database
+	db, err := database.GetDB()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	fmt.Println(rows.Columns())
-	rows.Scan(&repo)
+	rows, err := db.Query(allQuery)
+	if err != nil {
+		return nil, err
+	}
 
-	return &repo
+	var repository Repository
+
+	for rows.Next() {
+		rows.Scan(&repository.ID, &repository.Name, &repository.Location)
+		repositories = append(repositories, &repository)
+	}
+
+	return repositories, nil
 }
