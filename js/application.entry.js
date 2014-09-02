@@ -11,6 +11,7 @@ var App = require('base');
 var InstallPage = require('pages/install_page');
 var RepoPage = require('pages/repo_page');
 
+
 React.renderComponent((
   <Routes>
 		<Route handler={App}>

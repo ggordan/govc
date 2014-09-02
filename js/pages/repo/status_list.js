@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 var React = require('react');
-
+var io = require('socket.io-client');
 var $ = require('jquery');
 
 
@@ -17,7 +17,7 @@ var Status = React.createClass({
 
     // RENDER
 
-    componentWillMount: function() {
+    _retrieveStatus: function() {
         $.ajax({
             url: "/status",
             success: function(c) {
@@ -26,6 +26,18 @@ var Status = React.createClass({
                 });
             }.bind(this)
         });
+    },
+
+    componentWillMount: function() {
+        this._retrieveStatus()
+    },
+
+    componentDidMount: function() {
+        var socket = io('http://localhost');
+        socket.on('Changed', function (data) {
+            console.log('stuff changed');
+            this._retrieveStatus();
+        }.bind(this));
     },
 
     render: function() {

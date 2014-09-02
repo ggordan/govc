@@ -5,9 +5,12 @@ import (
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/ggordan/govc/controllers"
+	"github.com/ggordan/govc/watch"
 )
 
 func main() {
+
+	go watch.WatchRepoForChanges()
 
 	// Get the user dashboard with all the repositories
 	http.HandleFunc("/dashboard", controllers.Dashboard)
