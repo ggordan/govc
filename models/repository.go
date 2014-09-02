@@ -81,9 +81,8 @@ func GetAllRepositories() (repositories []*Repository, err error) {
 		return nil, err
 	}
 
-	var repository Repository
-
 	for rows.Next() {
+		var repository Repository
 		rows.Scan(&repository.ID, &repository.Name, &repository.Location)
 		repositories = append(repositories, &repository)
 	}

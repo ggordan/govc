@@ -15,6 +15,14 @@ var Status = React.createClass({
     // RENDER
 
     componentWillMount: function() {
+        $.ajax({
+            url: "/commits",
+            success: function(c) {
+                this.setState({
+                    commits: JSON.parse(c)
+                });
+            }.bind(this)
+        });
     },
 
     render: function() {

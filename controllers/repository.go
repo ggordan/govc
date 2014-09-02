@@ -2,13 +2,14 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
+	git2go "github.com/ggordan/git2go"
 	"github.com/ggordan/govc/git"
 	"github.com/gorilla/mux"
-	git2go "github.com/libgit2/git2go"
 )
 
 const defaultCommitsPerPage int = 10
@@ -25,10 +26,10 @@ type metaStruct struct {
 	Branches []branchJSON
 }
 
-// Commits returns all the commits for the specified repository
+// Branches returns all the commits for the specified repository
 func Branches(res http.ResponseWriter, req *http.Request) {
 	var meta metaStruct
-	repo, err := git2go.OpenRepository("/home/ggordan/bootstrap")
+	repo, err := git2go.OpenRepository("/Users/ggordan/bootstrap")
 	if err != nil {
 		panic(err)
 	}
@@ -91,7 +92,7 @@ func Commits(res http.ResponseWriter, req *http.Request) {
 	// Get the request variables from the URL
 	_ = mux.Vars(req)
 
-	repo, err := git2go.OpenRepository("/home/ggordan/bootstrap")
+	repo, err := git2go.OpenRepository("/Users/ggordan/bootstrap")
 	if err != nil {
 		panic(err)
 	}
@@ -120,4 +121,32 @@ func Commits(res http.ResponseWriter, req *http.Request) {
 
 	marshaledCommitJSON, _ := json.Marshal(commits)
 	res.Write(marshaledCommitJSON)
+}
+
+// Status returns all the commits for the specified repository
+func Status(res http.ResponseWriter, req *http.Request) {
+	var b []interface{}
+
+	repo, err := git2go.OpenRepository("/Users/ggordan/bootstrap")
+	if err != nil {
+		panic(err)
+	}
+
+	var so git2go.StatusOptions
+
+	statusList, _ := repo.StatusList(&so)
+
+	entries, _ := statusList.EntryCount()
+
+	for i := 0; i < entries; i++ {
+		entry, _ := statusList.ByIndex(i)
+		fmt.Println(entry)
+		b = append(b, entry)
+	}
+
+	fmt.Println("DATA", statusList, entries)
+
+	bb, _ := json.Marshal(b)
+
+	res.Write(bb)
 }

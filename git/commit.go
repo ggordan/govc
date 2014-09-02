@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"time"
 
-	git2go "github.com/libgit2/git2go"
+	git2go "github.com/ggordan/git2go"
 )
 
 type signature struct {

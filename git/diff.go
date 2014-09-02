@@ -1,6 +1,8 @@
 package git
 
-import git2go "github.com/libgit2/git2go"
+import (
+	git2go "github.com/ggordan/git2go"
+)
 
 type changeSet struct {
 	Prev, Next, Patch string
