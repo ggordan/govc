@@ -1,34 +1,44 @@
 package controllers
 
 import (
-	"database/sql"
-	"io/ioutil"
-	"log"
+	"encoding/json"
 	"net/http"
-	"os"
-	"path"
 
-	"github.com/ggordan/govc/conf"
-	_ "github.com/mattn/go-sqlite3"
+	git2go "github.com/ggordan/git2go"
+	"github.com/ggordan/govc/models"
 )
 
-// Dashboard s
+type dashboardJSON struct {
+	Repo   *models.Repository
+	Exists bool
+}
+
+// Dashboard re all the repositories that the user has created
 func Dashboard(res http.ResponseWriter, req *http.Request) {
+	var repositoriesJSON []dashboardJSON
 
-	// Get the directory of the SQLITE database
-	databasePath := conf.GetDBPath()
-	schemaPath := path.Join(os.Getenv("PWD"), "schema.sql")
-
-	db, err := sql.Open("sqlite3", databasePath)
+	// Get all the repositories that the user has created
+	repositories, err := models.GetAllRepositories()
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
-	content, err := ioutil.ReadFile(schemaPath)
-
-	_, err = db.Exec(string(content))
-	if err != nil {
-		log.Printf("%q: %s\n", err, string(content))
-		return
+	// go through all the repositories and verify that they actually exist in the
+	// database
+	for _, repo := range repositories {
+		var dashboardRepo dashboardJSON
+		dashboardRepo.Repo = repo
+		r, _ := git2go.OpenRepository(repo.Location)
+		if r != nil {
+			dashboardRepo.Exists = true
+		}
+		repositoriesJSON = append(repositoriesJSON, dashboardRepo)
 	}
+
+	b, err := json.Marshal(repositoriesJSON)
+	if err != nil {
+		panic(err)
+	}
+
+	res.Write(b)
 }
