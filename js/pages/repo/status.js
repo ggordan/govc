@@ -2,6 +2,9 @@
 
 var React = require('react');
 
+var io = require('socket.io-client');
+
+
 // --------------------------------
 
 var Status = React.createClass({
@@ -23,6 +26,20 @@ var Status = React.createClass({
                 });
             }.bind(this)
         });
+    },
+
+    componentDidMount: function() {
+      var socket = io('http://localhost:8090');
+      socket.on('news', function (data) {
+        $.ajax({
+            url: "/commits",
+            success: function(c) {
+                this.setState({
+                    commits: JSON.parse(c)
+                });
+            }.bind(this)
+        });
+      }.bind(this));
     },
 
     render: function() {

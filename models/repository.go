@@ -48,7 +48,7 @@ func CreateRepository(name, location string) (repository *Repository, err error)
 }
 
 // GetRepository retries the repository with the id
-func GetRepository(searchID int) (repository Repository, err error) {
+func GetRepository(searchID string) (repository Repository, err error) {
 
 	getQuery := fmt.Sprintf("SELECT * FROM %s WHERE id = ?", RepositoryTableName)
 

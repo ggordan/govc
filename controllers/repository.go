@@ -9,6 +9,7 @@ import (
 
 	git2go "github.com/ggordan/git2go"
 	"github.com/ggordan/govc/git"
+	"github.com/ggordan/govc/models"
 	"github.com/gorilla/mux"
 )
 
@@ -29,7 +30,7 @@ type metaStruct struct {
 // Branches returns all the commits for the specified repository
 func Branches(res http.ResponseWriter, req *http.Request) {
 	var meta metaStruct
-	repo, err := git2go.OpenRepository("/home/ggordan/bootstrap")
+	repo, err := git2go.OpenRepository("/Users/ggordan/bootstrap")
 	if err != nil {
 		panic(err)
 	}
@@ -89,12 +90,16 @@ func Commits(res http.ResponseWriter, req *http.Request) {
 
 	log.Println(pageNumber, commitsPerPage)
 
-	// Get the request variables from the URL
-	_ = mux.Vars(req)
-
-	repo, err := git2go.OpenRepository("/home/ggordan/bootstrap")
+	// Get the repository details
+	params := mux.Vars(req)
+	repoDB, err := models.GetRepository(params["pid"])
 	if err != nil {
-		panic(err)
+		panic("missing")
+	}
+
+	repo, err := git2go.OpenRepository(repoDB.Location)
+	if err != nil {
+		panic("repository folder missing")
 	}
 
 	odb, err := repo.Odb()
@@ -133,7 +138,7 @@ func Status(res http.ResponseWriter, req *http.Request) {
 
 	var b []statusJSON
 
-	repo, err := git2go.OpenRepository("/home/ggordan/bootstrap")
+	repo, err := git2go.OpenRepository("/Users/ggordan/bootstrap")
 	if err != nil {
 		panic(err)
 	}

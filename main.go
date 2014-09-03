@@ -5,23 +5,35 @@ import (
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/ggordan/govc/controllers"
-	"github.com/ggordan/govc/watch"
+	"github.com/googollee/go-socket.io"
+	"github.com/gorilla/mux"
 )
 
 func main() {
 
-	go watch.WatchRepoForChanges()
+	router := mux.NewRouter()
 
 	// Get the user dashboard with all the repositories
-	http.HandleFunc("/dashboard", controllers.Dashboard)
+	router.HandleFunc("/dashboard", controllers.Dashboard)
 
 	// Repository specific handlers
-	http.HandleFunc("/commits", controllers.Commits)
-	http.HandleFunc("/status", controllers.Status)
-	http.HandleFunc("/branches", controllers.Branches)
+	router.HandleFunc("/api/{pid}/commits", controllers.Commits)
+	router.HandleFunc("/api/{pid}/status", controllers.Status)
+	router.HandleFunc("/api/{pid}/branches", controllers.Branches)
+
+	mux := http.NewServeMux()
+	mux.Handle("/", http.StripPrefix("/", http.FileServer(rice.MustFindBox("built/dev").HTTPBox())))
+	mux.Handle("/api/", router)
+
+	router.Handle("/static", http.FileServer(rice.MustFindBox("built/dev").HTTPBox()))
+
+	http.ListenAndServe(":8090", mux)
+
+	// The socket.io server
+	io, _ := socketio.NewServer(nil)
+	http.Handle("/socket.io/", io)
 
 	// Bundles all the assets into the Go binary
-	http.Handle("/", http.FileServer(rice.MustFindBox("built/dev").HTTPBox()))
 
 	// Start listening to requests
 	http.ListenAndServe(":8090", nil)

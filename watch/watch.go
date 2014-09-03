@@ -2,20 +2,15 @@ package watch
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/googollee/go-socket.io"
 	"gopkg.in/fsnotify.v1"
 )
 
-func WatchRepoForChanges() {
+func WatchRepoForChanges(server *socketio.Server) {
 
 	done := make(chan bool)
-
-	server, err := socketio.NewServer(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+	changed := make(chan bool)
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -23,29 +18,45 @@ func WatchRepoForChanges() {
 	}
 	defer watcher.Close()
 
-	server.On("connection", func(so socketio.Socket) {
-		go func() {
-			log.Println("error:")
-
+	go func(c chan bool) {
+		server.On("connection", func(so socketio.Socket) {
+			log.Println("socket side")
 			for {
-				select {
-				case event := <-watcher.Events:
-					if event.Op&fsnotify.Write == fsnotify.Write {
-						so.Emit("Changed")
-						log.Println("modified file:", event.Name)
-					}
-				case err := <-watcher.Errors:
-					log.Println("error:", err)
+				t := <-c
+				if t {
+					log.Println("change socket fired")
+					so.Emit("news")
 				}
 			}
-		}()
-	})
+			so.On("disconnection", func() {
+				watcher.Remove("/Users/ggordan/bootstrap")
+			})
+		})
+		server.On("error", func(so socketio.Socket, err error) {
+			log.Println("an error occurred")
+			watcher.Remove("/Users/ggordan/bootstrap")
+		})
+	}(changed)
 
-	err = watcher.Add("/home/ggordan/bootstrap")
+	go func(c chan bool) {
+		log.Println("watcher side")
+		for {
+			select {
+			case event := <-watcher.Events:
+				c <- true
+				if event.Op&fsnotify.Write == fsnotify.Write {
+					log.Println("modified file:", event.Name)
+				}
+			case err := <-watcher.Errors:
+				log.Println("error:", err)
+			}
+		}
+	}(changed)
+
+	err = watcher.Add("/Users/ggordan/bootstrap")
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Watcher error occurred")
 	}
 	<-done
 
-	http.Handle("/socket.io/", server)
 }

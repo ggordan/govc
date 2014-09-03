@@ -11,6 +11,13 @@ var App = require('base');
 var InstallPage = require('pages/install_page');
 var RepoPage = require('pages/repo_page');
 
+	var io = require('socket.io-client');
+  var socket = io('http://localhost:8090');
+  socket.on('news', function (data) {
+    console.log(data);
+    console.log("news data");
+    socket.emit('my other event', { my: 'data' });
+  });
 
 React.renderComponent((
   <Routes>

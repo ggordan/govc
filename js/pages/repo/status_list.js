@@ -29,7 +29,7 @@ var Status = React.createClass({
     },
 
     componentWillMount: function() {
-        this._retrieveStatus()
+        this._retrieveStatus();
     },
 
     componentDidMount: function() {

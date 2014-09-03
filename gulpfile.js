@@ -76,7 +76,7 @@ gulp.task('webpack', ['js:dev'], function(callback) {
 gulp.task('dev', ['sass:dev', 'index:dev', 'img:dev', 'font:dev', 'webpack']);
 
 gulp.task('watch', function() {
-	livereload.listen();
+	// livereload.listen();
 	webpack(_.extend(webpackConf, {
 		cache: true,
 		watch: true,
