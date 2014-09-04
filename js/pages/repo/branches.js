@@ -21,7 +21,7 @@ var Branches = React.createClass({
 
     componentWillMount: function() {
     	$.ajax({
-    		url: "/branches",
+            url: "/api/"+ this.props.pid +"/branches",
     		success: function(c) {
                 var remote = [];
                 var local = [];
@@ -53,9 +53,9 @@ var Branches = React.createClass({
     render: function() {
         return(
             <div className="branches">
-                <Category title="Local" data={this.state.local} />
-                <Category title="Remote" data={this.state.remote} />
-                <Category title="Tags" data={this.state.tags} />
+                <Category title="Local" data={this.state.local} pid={this.props.pid} />
+                <Category title="Remote" data={this.state.remote} pid={this.props.pid} />
+                <Category title="Tags" data={this.state.tags} pid={this.props.pid} />
             </div>
         );
     },

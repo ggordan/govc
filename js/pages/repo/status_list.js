@@ -19,7 +19,7 @@ var Status = React.createClass({
 
     _retrieveStatus: function() {
         $.ajax({
-            url: "/status",
+            url: "/api/"+ this.props.pid +"/status",
             success: function(c) {
                 this.setState({
                     status: JSON.parse(c)
@@ -30,14 +30,6 @@ var Status = React.createClass({
 
     componentWillMount: function() {
         this._retrieveStatus();
-    },
-
-    componentDidMount: function() {
-        var socket = io('http://localhost');
-        socket.on('Changed', function (data) {
-            console.log('stuff changed');
-            this._retrieveStatus();
-        }.bind(this));
     },
 
     render: function() {
