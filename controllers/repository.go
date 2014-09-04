@@ -30,7 +30,15 @@ type metaStruct struct {
 // Branches returns all the commits for the specified repository
 func Branches(res http.ResponseWriter, req *http.Request) {
 	var meta metaStruct
-	repo, err := git2go.OpenRepository("/Users/ggordan/bootstrap")
+
+	// Get the repository details
+	params := mux.Vars(req)
+	repoDB, err := models.GetRepository(params["pid"])
+	if err != nil {
+		panic("missing")
+	}
+
+	repo, err := git2go.OpenRepository(repoDB.Location)
 	if err != nil {
 		panic(err)
 	}
@@ -106,8 +114,8 @@ func Commits(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-
 	odb.ForEach(func(id *git2go.Oid) error {
+		fmt.Println(id.String())
 		if i > commitsPerPage || id.IsZero() {
 			return nil
 		}
@@ -138,7 +146,14 @@ func Status(res http.ResponseWriter, req *http.Request) {
 
 	var b []statusJSON
 
-	repo, err := git2go.OpenRepository("/Users/ggordan/bootstrap")
+	// Get the repository details
+	params := mux.Vars(req)
+	repoDB, err := models.GetRepository(params["pid"])
+	if err != nil {
+		panic("missing")
+	}
+
+	repo, err := git2go.OpenRepository(repoDB.Location)
 	if err != nil {
 		panic(err)
 	}
@@ -171,8 +186,6 @@ func Status(res http.ResponseWriter, req *http.Request) {
 			Entry: entry,
 		})
 	}
-
-	fmt.Println("DATA", statusList, entries)
 
 	bb, _ := json.Marshal(b)
 

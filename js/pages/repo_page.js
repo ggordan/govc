@@ -12,14 +12,17 @@ var RepoPage = React.createClass({
     // RENDER
 
     render: function() {
+
+        console.log(this.props);
+
         return(
             <div id="app" className="repo">
             	<div className="sidebar">
-                    <Branches />
+                    <Branches pid={this.props.params.pid} />
                 </div>
             	<div className="repository">
-	            	<StatusList />
-	            	<Commits />
+	            	<StatusList pid={this.props.params.pid} />
+	            	<Commits pid={this.props.params.pid} />
             	</div>
             </div>
         );

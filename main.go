@@ -5,7 +5,6 @@ import (
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/ggordan/govc/controllers"
-	"github.com/googollee/go-socket.io"
 	"github.com/gorilla/mux"
 )
 
@@ -21,6 +20,9 @@ func main() {
 	router.HandleFunc("/api/{pid}/status", controllers.Status)
 	router.HandleFunc("/api/{pid}/branches", controllers.Branches)
 
+	// Branch specific handlers
+	router.HandleFunc("/api/{pid}/branches/checkout", controllers.CheckoutBranch)
+
 	mux := http.NewServeMux()
 	mux.Handle("/", http.StripPrefix("/", http.FileServer(rice.MustFindBox("built/dev").HTTPBox())))
 	mux.Handle("/api/", router)
@@ -28,10 +30,6 @@ func main() {
 	router.Handle("/static", http.FileServer(rice.MustFindBox("built/dev").HTTPBox()))
 
 	http.ListenAndServe(":8090", mux)
-
-	// The socket.io server
-	io, _ := socketio.NewServer(nil)
-	http.Handle("/socket.io/", io)
 
 	// Bundles all the assets into the Go binary
 
